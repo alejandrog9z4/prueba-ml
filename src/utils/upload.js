@@ -1,16 +1,12 @@
 import axios from "axios"
 
-// initializing axios
+
 const api = axios.create({
   baseURL: "http://meli-lb-1346773068.us-east-1.elb.amazonaws.com",
 })
 
-// original source: https://github.com/pilovm/multithreaded-uploader/blob/master/frontend/uploader.js
 export class Uploader {
   constructor(options) {
-    // this must be bigger than or equal to 5MB,
-    // otherwise AWS will respond with:
-    // "Your proposed upload is smaller than the minimum allowed size"
     this.chunkSize = options.chunkSize || 1024 * 1024 * 5
     // number of parallel uploads
     this.threadsQuantity = Math.min(options.threadsQuantity || 5, 15)
@@ -36,14 +32,13 @@ export class Uploader {
 
   async initialize() {
     try {
-      // adding the the file extension (if present) to fileName
+
       let fileName = this.fileName
       const ext = this.file.name.split(".").pop()
       if (ext) {
         fileName += `.${ext}`
       }
 
-      // initializing the multipart request
       const multipartUploadInput = {
         name: fileName,
       }
@@ -58,7 +53,6 @@ export class Uploader {
       this.fileId = AWSFileDataOutput.fileId
       this.fileKey = AWSFileDataOutput.fileKey
 
-      // retrieving the pre-signed URLs
       const numberOfparts = Math.ceil(this.file.size / this.chunkSize)
 
       const AWSMultipartFileDataInput = {
@@ -100,8 +94,6 @@ export class Uploader {
     const activeConnections = Object.keys(this.activeConnections).length;
 
     if (this.parts.length === 0 && activeConnections === 0) {
-      // Todas las partes han sido procesadas y no hay conexiones activas,
-      // entonces intenta completar la subida.
       this.complete();
       return;
     }
@@ -123,7 +115,6 @@ export class Uploader {
             this.sendNext();
           })
           .catch(() => {
-            // En caso de error, no es necesario hacer nada aquí ya que el reintento se maneja en sendChunk
             delete this.activeConnections[part.PartNumber];
             this.sendNext();
           });
@@ -167,27 +158,24 @@ export class Uploader {
 
   async sendChunk(chunk, part, retryCount) {
     return new Promise(async (resolve, reject) => {
-      // Define el número máximo de reintentos
       const maxRetries = 3;
-  
-      // Función para intentar subir una parte del archivo
+
       const attemptUpload = async (fileChunk, uploadPart, attemptCount) => {
         const xhr = new XMLHttpRequest();
         xhr.open("PUT", uploadPart.signedUrl);
   
-        // Manejador de progreso de subida
         xhr.upload.addEventListener("progress", (event) => {
           this.handleProgress(uploadPart.PartNumber, event);
         });
   
         xhr.onload = async () => {
           if (xhr.status === 200) {
-            // En caso de éxito, procesa la respuesta
+
             const ETag = xhr.getResponseHeader("ETag").replaceAll('"', "");
             this.uploadedParts.push({ PartNumber: uploadPart.PartNumber, ETag: ETag });
             resolve();
           } else {
-            // En caso de fallo, intenta reintentar o rechaza
+
             retryOrFail(fileChunk, uploadPart, attemptCount);
           }
         };
@@ -201,7 +189,7 @@ export class Uploader {
         xhr.send(fileChunk);
       };
   
-      // Función para manejar reintentos o fallos
+      // Función para manejar reintentos o fallos de las url que su tiempo de vida ha finalizado
       const retryOrFail = async (fileChunk, uploadPart, attemptCount) => {
         if (attemptCount < maxRetries) {
           console.log(`Retrying upload of part ${uploadPart.PartNumber}, attempt ${attemptCount + 1}`);
@@ -215,7 +203,7 @@ export class Uploader {
             reject(error);
           }
         } else {
-          // Si se supera el número máximo de reintentos, rechaza la promesa
+
           reject(new Error(`Failed to upload part ${uploadPart.PartNumber} after ${maxRetries} attempts`));
         }
       };

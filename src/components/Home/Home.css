@@ -1,0 +1,31 @@
+.home-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box; 
+  }
+  
+  .home-container h2 {
+    margin-bottom: 20px; 
+    color: #007bff; 
+    font-size: 2rem; 
+  }
+  
+  .home-container p {
+    margin-bottom: 15px; 
+    color: #333; 
+    line-height: 1.5; 
+  }
+  
+  .home-container ul {
+    text-align: left; 
+    margin-top: 10px; 
+  }
+  
+  .home-container li {
+    margin-bottom: 10px; 
+  }
+  

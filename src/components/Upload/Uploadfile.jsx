@@ -1,6 +1,6 @@
 import { Uploader } from "../../utils/upload";
 import {useState, useRef} from "react";
-import "./Upload.css";
+import "../Upload/Upload.css";
 
 function UploadFile () {
     const [files, setFiles] = useState([]);
@@ -8,6 +8,12 @@ function UploadFile () {
     const [uploaderInstances, setUploaderInstances] = useState({});
     const fileInputRef = useRef(null); // Ref para el input de archivos
   
+
+    /**
+     * funcio que inicia el proceso de subir el archivo haciendo las peticines al
+     * backend de los metodos para generar fileId
+     * 
+     */
     const onUpload = (fileIndex) => {
       const file = files[fileIndex];
       if (file) {
@@ -32,7 +38,6 @@ function UploadFile () {
         uploader.start();
         setUploadStatus(prev => ({ ...prev, [fileIndex]: { uploading: true, percentage: 0 }}));
   
-        // Opcional: Limpiar el input file después de subir un archivo
         if (fileInputRef.current) {
           fileInputRef.current.value = "";
         }
@@ -53,24 +58,24 @@ function UploadFile () {
     };
   
     return (
-      <div className="App">
-        <h1>Upload your files</h1>
+      <div className="Upload">
+        <h1>Carga tus archivos</h1>
         <input
           type="file"
-          ref={fileInputRef} // Asigna la ref al input
+          ref={fileInputRef} 
           onChange={onAddAnotherFile}
         />
         {files.map((file, index) => (
           <div key={index} className="file-container">
             {uploadStatus[index]?.uploading ? (
               <>
-                <div className="uploading-status">Uploading <span className="file-name">{file.name}</span>: {uploadStatus[index].percentage}%</div>
-                <button onClick={() => onCancel(index)}>Cancel</button>
+                <div className="uploading-status">Cargando<span className="file-name">{file.name}</span>: {uploadStatus[index].percentage}%</div>
+                <button onClick={() => onCancel(index)}>Cancelar</button>
               </>
             ) : (
               <>
                 <div className="file-name">{file.name}</div>
-                <button onClick={() => onUpload(index)}>Upload</button>
+                <button onClick={() => onUpload(index)}>Subir</button>
               </>
             )}
           </div>

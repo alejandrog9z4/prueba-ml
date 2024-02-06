@@ -5,35 +5,39 @@ import '@aws-amplify/ui-react/styles.css';
 import Home from "./components/Home/Home";
 import UploadFile from "./components/Upload/Uploadfile";
 import {Amplify} from 'aws-amplify';
-import awsExports from './aws-exports'; // Asegúrate de tener este archivo configurado correctamente
+import awsExports from './aws-exports';
+import "./App.css"
+
 Amplify.configure(awsExports);
+
+
 function AuthenticatedApp() {
-  const { signOut } = useAuthenticator((context) => [context.user]);
+const { signOut } = useAuthenticator((context) => [context.user]);
 
   return (
     <>
-      <nav>
-        <NavLink to="/">Home</NavLink>
-        <NavLink to="/upload">Upload File</NavLink>
-        <button onClick={signOut}>Logout</button>
+      <nav className="nav-container">
+        <NavLink className="nav-link" to="/">Home</NavLink>
+        <NavLink className="nav-link" to="/upload">Upload File</NavLink>
+        <button className="logout-button" onClick={signOut}>Logout</button>
       </nav>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/upload" element={<UploadFile />} />
-      </Routes>
+      <div className="content-container">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/upload" element={<UploadFile />} />
+        </Routes>
+      </div>
     </>
   );
 }
 
 function App() {
-  const { signOut } = useAuthenticator((context) => [context.user]);
-
   return (
     <BrowserRouter>
       <div className="App">
         <Authenticator>
           {({ signOut, user }) => (
-            user ? <AuthenticatedApp /> : <Home />
+            user ? <AuthenticatedApp signOut={signOut} /> : <Home />
           )}
         </Authenticator>
       </div>
