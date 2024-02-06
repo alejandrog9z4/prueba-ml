@@ -15,14 +15,14 @@ Este proyecto proporciona una API desarrollada para permitir la carga de archivo
 
 ## Características
 
-- **Carga Eficiente de Grandes Archivos**: Capacidad para cargar archivos de más de 1GB, utilizando técnicas como la carga multipart y la optimización de la red.
+- **Carga Eficiente de Grandes Archivos**: Capacidad para cargar archivos de más de 1GB, utilizando técnicas como la carga multipart,la optimización de la red y logica para reintentos de archivos cuya presigned url haya finalizado debido al tiempo de vida de 15 minutos por url.
 - **Seguridad**: Implementación de AWS WAF para proteger contra ataques comunes, junto con la autenticación de usuarios mediante AWS Cognito.
 - **Alta Disponibilidad y Escalabilidad**: Uso de Autoscaling Groups y ALB para garantizar la disponibilidad del servicio y su capacidad para escalar según la demanda.
 - **Almacenamiento Eficiente**: Utilización de AWS S3 para el almacenamiento de archivos, aprovechando su escalabilidad, durabilidad y bajo costo.
 
 ## Requisitos
 
-- Node.js (Versión x.x o superior)
+- Node.js 14.5 o superior
 - Cuenta de AWS con los servicios mencionados configurados.
 
 ## Configuración y Despliegue
@@ -31,7 +31,7 @@ Este proyecto proporciona una API desarrollada para permitir la carga de archivo
 
 - Asegúrate de tener configurados AWS S3, AWS Cognito, AWS WAF, y los demás servicios según las necesidades de tu proyecto.
 
-### Configuración del Proyecto:
+### Configuración del Proyecto Backend:
 
 - Clona este repositorio.
 - Instala las dependencias con `npm install`.
@@ -61,6 +61,6 @@ Este proyecto implementa varias medidas de seguridad, incluyendo:
 
 Las contribuciones son bienvenidas. Por favor, revisa las guías de contribución antes de hacer un pull request.
 
-## Licencia
+## Nota
 
-Este proyecto está licenciado bajo [Incluir tipo de licencia], vea el archivo LICENSE para más detalles.
+Este proyecto está ligado a llaves de aws de una cuenta personal se deben hacer las adecuaciones para su implementacion en su cuenta personal adjunto en el pdf
