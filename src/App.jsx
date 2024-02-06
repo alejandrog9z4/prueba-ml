@@ -1,35 +1,44 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-
-function App() {
-  const [count, setCount] = useState(0)
+import React from "react";
+import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
+import { Authenticator, useAuthenticator, withAuthenticator } from '@aws-amplify/ui-react';
+import '@aws-amplify/ui-react/styles.css';
+import Home from "./components/Home/Home";
+import UploadFile from "./components/Upload/Uploadfile";
+import {Amplify} from 'aws-amplify';
+import awsExports from './aws-exports'; // Asegúrate de tener este archivo configurado correctamente
+Amplify.configure(awsExports);
+function AuthenticatedApp() {
+  const { signOut } = useAuthenticator((context) => [context.user]);
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <nav>
+        <NavLink to="/">Home</NavLink>
+        <NavLink to="/upload">Upload File</NavLink>
+        <button onClick={signOut}>Logout</button>
+      </nav>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/upload" element={<UploadFile />} />
+      </Routes>
     </>
-  )
+  );
 }
 
-export default App
+function App() {
+  const { signOut } = useAuthenticator((context) => [context.user]);
+
+  return (
+    <BrowserRouter>
+      <div className="App">
+        <Authenticator>
+          {({ signOut, user }) => (
+            user ? <AuthenticatedApp /> : <Home />
+          )}
+        </Authenticator>
+      </div>
+    </BrowserRouter>
+  );
+}
+
+export default  withAuthenticator(App);
