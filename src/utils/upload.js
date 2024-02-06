@@ -1,6 +1,8 @@
 import axios from "axios"
 
-
+/**
+ * Crea una instancia de axios para las solicitudes HTTP con una base URL predefinida.
+ */
 const api = axios.create({
   baseURL: "http://meli-lb-1346773068.us-east-1.elb.amazonaws.com",
 })
@@ -8,7 +10,6 @@ const api = axios.create({
 export class Uploader {
   constructor(options) {
     this.chunkSize = options.chunkSize || 1024 * 1024 * 5
-    // number of parallel uploads
     this.threadsQuantity = Math.min(options.threadsQuantity || 5, 15)
     this.file = options.file
     this.fileName = options.fileName
@@ -29,7 +30,9 @@ export class Uploader {
       .then(() => this.sendNext())
       .catch(error => this.complete(error));
   }
-
+/**
+ * Prepara y obtiene las URLs presignadas de AWS para la carga de archivos por partes.
+ */
   async initialize() {
     try {
 
@@ -75,21 +78,25 @@ export class Uploader {
       await this.complete(error)
     }
   }
-
+/**
+ * Genera una nueva URL presignada para una parte del archivo en caso de necesitarlo.
+ */
   async regeneratePresignedUrlForPart(fileKey, fileId, partNumber) {
     try {
       const response = await api.post('/regeneratePresignedUrl', {
         fileKey,
         fileId,
-        partNumbers: [partNumber], // Asumiendo que el endpoint acepta una lista de números de parte
+        partNumbers: [partNumber], 
       });
-      return response.data.parts[0]; // Devuelve la nueva parte con su URL presignada
+      return response.data.parts[0]; 
     } catch (error) {
       console.log('Error regenerating presigned URL:', error);
       throw error;
     }
   }
-
+/**
+ * Maneja el envío de la siguiente parte del archivo, controlando la cantidad de cargas paralelas activas.
+ */
   async sendNext() {
     const activeConnections = Object.keys(this.activeConnections).length;
 
@@ -103,14 +110,14 @@ export class Uploader {
       if (this.file && part) {
         const sentSize = (part.PartNumber - 1) * this.chunkSize;
         const chunk = this.file.slice(sentSize, sentSize + this.chunkSize);
-        const sendChunkPromise = this.sendChunk(chunk, part, 0); // Agrega un contador de reintento inicializado en 0
+        const sendChunkPromise = this.sendChunk(chunk, part, 0); 
 
-        // Marca esta conexión como activa
+    
         this.activeConnections[part.PartNumber] = sendChunkPromise;
 
         sendChunkPromise
           .then(() => {
-            // Elimina la conexión activa al completar
+          
             delete this.activeConnections[part.PartNumber];
             this.sendNext();
           })
@@ -121,7 +128,9 @@ export class Uploader {
       }
     }
   }
-
+/**
+ * Finaliza el proceso de carga, ya sea exitosamente o con un error, y ejecuta la función de callback correspondiente.
+ */
   async complete(error) {
     if (error && !this.aborted) {
       this.onErrorFn(error)
@@ -155,7 +164,9 @@ export class Uploader {
       })
     }
   }
-
+  /**
+   * Envía una solicitud para marcar la carga como completa en el servidor.
+   */
   async sendChunk(chunk, part, retryCount) {
     return new Promise(async (resolve, reject) => {
       const maxRetries = 3;
@@ -181,25 +192,26 @@ export class Uploader {
         };
   
         xhr.onerror = () => {
-          // Manejador de errores de la solicitud
+ 
           retryOrFail(fileChunk, uploadPart, attemptCount);
         };
   
-        // Envía la parte del archivo
+ 
         xhr.send(fileChunk);
       };
-  
-      // Función para manejar reintentos o fallos de las url que su tiempo de vida ha finalizado
+/**
+ * Envía una parte del archivo al servidor, con lógica para reintentos en caso de fallo.
+ */
       const retryOrFail = async (fileChunk, uploadPart, attemptCount) => {
         if (attemptCount < maxRetries) {
           console.log(`Retrying upload of part ${uploadPart.PartNumber}, attempt ${attemptCount + 1}`);
           try {
-            // Intenta regenerar la URL presignada para la parte fallida
+
             const newPart = await this.regeneratePresignedUrlForPart(this.fileKey, this.fileId, uploadPart.PartNumber);
-            // Reintenta con la nueva URL y aumenta el contador de intentos
+
             attemptUpload(fileChunk, newPart, attemptCount + 1);
           } catch (error) {
-            // Si falla la regeneración de la URL, rechaza la promesa
+
             reject(error);
           }
         } else {
@@ -208,11 +220,13 @@ export class Uploader {
         }
       };
   
-      // Inicia el primer intento de subida
+
       attemptUpload(chunk, part, retryCount);
     });
   }  
-
+/**
+ * Maneja los eventos de progreso para actualizar el estado de la carga y notificar al usuario.
+ */
   handleProgress(part, event) {
     if (this.file) {
       if (event.type === "progress" || event.type === "error" || event.type === "abort") {
@@ -284,16 +298,23 @@ export class Uploader {
     });
   }
 
+  /**
+   * Establece una función de callback para notificar sobre el progreso de la carga.
+   */
   onProgress(onProgress) {
     this.onProgressFn = onProgress
     return this
   }
-
+/**
+ * Establece una función de callback para manejar errores durante el proceso de carga.
+ */
   onError(onError) {
     this.onErrorFn = onError
     return this
   }
-
+/**
+ *  Permite abortar todas las cargas activas y marca el proceso de carga como abortado.
+ */
   abort() {
     Object.keys(this.activeConnections)
       .map(Number)
