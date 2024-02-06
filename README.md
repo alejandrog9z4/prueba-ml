@@ -55,6 +55,7 @@ Este proyecto implementa varias medidas de seguridad, incluyendo:
 
 - Autenticación y autorización de usuarios mediante AWS Cognito.
 - Protección contra ataques web comunes con AWS WAF.
+- Se agrego una Georestriccion para solo permitir peticiones de Mexico, Colombia y Argentina 
 - Comunicaciones seguras a través de HTTPS.
 
 ## Contribuir
