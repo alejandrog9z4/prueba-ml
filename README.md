@@ -20,6 +20,9 @@ Este proyecto proporciona una API desarrollada para permitir la carga de archivo
 - **Alta Disponibilidad y Escalabilidad**: Uso de Autoscaling Groups y ALB para garantizar la disponibilidad del servicio y su capacidad para escalar según la demanda.
 - **Almacenamiento Eficiente**: Utilización de AWS S3 para el almacenamiento de archivos, aprovechando su escalabilidad, durabilidad y bajo costo.
 
+  
+![Screenshot 2024-02-06 at 1 35 03 p m](https://github.com/alejandrog9z4/prueba-ml/assets/60855700/e6b82073-2ca1-4df2-ab06-ec83a2098a8b)
+
 ## Requisitos
 
 - Node.js 14.5 o superior
