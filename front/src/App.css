@@ -1,0 +1,38 @@
+.nav-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px; 
+  padding: 20px 0; 
+}
+
+.nav-link, .logout-button {
+  text-decoration: none;
+  color: inherit;
+  padding: 10px 15px;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  height: 40px;
+}
+
+
+.nav-link:hover {
+  text-decoration: underline;
+}
+
+.content-container {
+  display: flex;
+  justify-content: center;
+  text-align: center; 
+}
+
+.content-container > * {
+  width: 100%;
+}
+
+.logout-button:hover{
+  background-color: rgb(248, 23, 23);
+  color: aliceblue;
+}
